@@ -1,38 +1,84 @@
-export const createWaypointTemplate = () => {
+const getDiffTime = (startEvent, endEvent) => {
+  const viewDiffTime = [];
+  const diffTime = (endEvent - startEvent) / 1000;
+  const diffDays = parseInt(diffTime / 60 / 60 / 24, 10);
+  viewDiffTime.push((diffDays === 0) ?
+    `` :
+    `${diffDays}D`);
+
+  const diffHours = parseInt(diffTime / 60 / 60, 10) - (diffDays * 24);
+  viewDiffTime.push((diffHours === 0) ?
+    `` :
+    `${diffHours}H`);
+
+  const diffMinutes = parseInt(diffTime / 60, 10) - (diffHours * 60);
+  viewDiffTime.push((diffMinutes === 0) ?
+    `` :
+    `${diffMinutes}M`);
+  return viewDiffTime.join(` `);
+};
+
+const createOffersTemplate = (offers) => {
+  return offers.map((offer) => `<li class="event__offer">
+      <span class="event__offer-title">${offer.description}</span>
+        &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+      </li>`).join(``);
+};
+
+export const checkLessThanTen = (number) => {
+  return (number.toString().length === 2) ? number : `0${number}`;
+};
+
+export const getTypeDestination = (type) => {
+  switch (type) {
+    case `Check`:
+      return `${type} in`;
+    case `Sightseeing`:
+      return `${type} in`;
+    case `Restaurant`:
+      return `${type} in`;
+    default:
+      return `${type} to`;
+  }
+};
+
+export const createWaypointTemplate = (event) => {
+  const {type, destination, startEvent, endEvent, price, offers} = event;
+
   return (
     `<li class="trip-events__item">
-                  <div class="event">
-                    <div class="event__type">
-                      <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
-                    </div>
-                    <h3 class="event__title">Taxi to Amsterdam</h3>
+      <div class="event">
+        <div class="event__type">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${
+    (type.toLowerCase() === `check`) ?
+      `check-in` :
+      type.toLowerCase()
+    }.png" alt="Event type icon">
+      </div>
+      <h3 class="event__title">${getTypeDestination(type)} ${destination}</h3>
+        <div class="event__schedule">
+          <p class="event__time">
+            <time class="event__start-time" datetime="${startEvent.toJSON()}">${checkLessThanTen(startEvent.getHours())}:${checkLessThanTen(startEvent.getMinutes())}</time>
+            &mdash;
+            <time class="event__end-time" datetime="${endEvent.toJSON()}">${checkLessThanTen(endEvent.getHours())}:${checkLessThanTen(endEvent.getMinutes())}</time>
+          </p>
+          <p class="event__duration">${getDiffTime(startEvent, endEvent)}</p>
+        </div>
 
-                    <div class="event__schedule">
-                      <p class="event__time">
-                        <time class="event__start-time" datetime="2019-03-18T10:30">10:30</time>
-                        &mdash;
-                        <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
-                      </p>
-                      <p class="event__duration">30M</p>
-                    </div>
+        <p class="event__price">
+          &euro;&nbsp;<span class="event__price-value">${price}</span>
+        </p>
 
-                    <p class="event__price">
-                      &euro;&nbsp;<span class="event__price-value">20</span>
-                    </p>
+        <h4 class="visually-hidden">Offers:</h4>
+        <ul class="event__selected-offers">
+          ${createOffersTemplate(offers)}
+        </ul>
 
-                    <h4 class="visually-hidden">Offers:</h4>
-                    <ul class="event__selected-offers">
-                      <li class="event__offer">
-                        <span class="event__offer-title">Order Uber</span>
-                        &plus;
-                        &euro;&nbsp;<span class="event__offer-price">20</span>
-                       </li>
-                    </ul>
-
-                    <button class="event__rollup-btn" type="button">
-                      <span class="visually-hidden">Open event</span>
-                    </button>
-                  </div>
-                </li>`
+        <button class="event__rollup-btn" type="button">
+          <span class="visually-hidden">Open event</span>
+        </button>
+      </div>
+    </li>`
   );
 };
