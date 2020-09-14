@@ -1,24 +1,20 @@
-import {createRouteInfoTemplate} from "./view/route-info.js";
-import {createTripCostTemplate} from "./view/trip-cost.js";
-import {createMenuTemplate} from "./view/menu.js";
-import {createFilterTemplate} from "./view/filter.js";
-import {createSortTemplate} from "./view/sort.js";
-import {createWaypointsContainerTemplate} from "./view/waypoints-container.js";
-import {createAddEditFormTemplate} from "./view/add-edit-form.js";
-import {createWaypointTemplate} from "./view/waypoint.js";
+import {ESCAPE_KEY} from "./const.js";
+import RouteInfoView from "./view/route-info.js";
+import TripCostView from "./view/trip-cost.js";
+import MenuView from "./view/menu.js";
+import FilterView from "./view/filter.js";
+import SortView from "./view/sort.js";
+import WaypointsContainerView from "./view/waypoints-container.js";
+import AddEditFormView from "./view/add-edit-form.js";
+import WaypointView from "./view/waypoint.js";
 import {generateEvent} from "./mock/event.js";
+import {ROUTE_POINT_COUNT} from "./const.js";
+import {render, RenderPosition} from "./utils.js";
 
-const ROUTE_POINT_COUNT = 4;
-
-const events = new Array(ROUTE_POINT_COUNT).fill().map(generateEvent);
+const events = Array.from({length: ROUTE_POINT_COUNT}, generateEvent);
 
 events.sort((first, second) => {
-  if (first.startEvent.getTime() < second.startEvent.getTime()) {
-    return -1;
-  } else if (first.startEvent.getTime() > second.startEvent.getTime()) {
-    return 1;
-  }
-  return 0;
+  return first.startEvent.getTime() - second.startEvent.getTime();
 });
 
 const getWaypointDays = () => {
@@ -34,8 +30,40 @@ const getWaypointDays = () => {
 
 const waypointDays = getWaypointDays(events);
 
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
+const renderWaypoint = (tripEventContainer, event) => {
+  const eventComponent = new WaypointView(event);
+  const eventAddEditComponent = new AddEditFormView(event);
+
+  const replaceCardToForm = () => {
+    tripEventContainer.replaceChild(eventAddEditComponent.getElement(), eventComponent.getElement());
+  };
+
+  const replaceFormToCard = () => {
+    tripEventContainer.replaceChild(eventComponent.getElement(), eventAddEditComponent.getElement());
+  };
+
+  const onEscKeyDown = (evt) => {
+    if (evt.key === ESCAPE_KEY.fullName || evt.key === ESCAPE_KEY.shortName) {
+      evt.preventDefault();
+      replaceFormToCard();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceCardToForm();
+
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  eventAddEditComponent.getElement().querySelector(`form`).addEventListener(`submit`, (evt) => {
+    evt.preventDefault();
+    replaceFormToCard();
+
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
+
+  render(tripEventContainer, eventComponent.getElement(), RenderPosition.BEFOREEND);
 };
 
 const renderPageAplication = () => {
@@ -44,32 +72,32 @@ const renderPageAplication = () => {
   const pageMain = pageBody.querySelector(`.page-main`);
 
   const tripMainElement = pageHeader.querySelector(`.trip-main`);
-  render(tripMainElement, createRouteInfoTemplate(events), `afterbegin`);
+
+  render(tripMainElement, new RouteInfoView(events).getElement(), RenderPosition.AFTERBEGIN);
 
   const tripMainInfoElement = tripMainElement.querySelector(`.trip-main__trip-info`);
-  render(tripMainInfoElement, createTripCostTemplate(events), `beforeend`);
+  render(tripMainInfoElement, new TripCostView(events).getElement(), RenderPosition.BEFOREEND);
 
   const tripMainControlsElement = tripMainElement.querySelector(`.trip-main__trip-controls`);
-  render(tripMainControlsElement, createMenuTemplate(), `beforeend`);
-  render(tripMainControlsElement, createFilterTemplate(), `beforeend`);
+  render(tripMainControlsElement, new MenuView().getElement(), RenderPosition.BEFOREEND);
+  render(tripMainControlsElement, new FilterView().getElement(), RenderPosition.BEFOREEND);
 
   const tripEventsElement = pageMain.querySelector(`.trip-events`);
-  render(tripEventsElement, createSortTemplate(), `beforeend`);
-  render(tripEventsElement, createWaypointsContainerTemplate(waypointDays), `beforeend`);
+  render(tripEventsElement, new SortView().getElement(), RenderPosition.BEFOREEND);
+  render(tripEventsElement, new WaypointsContainerView(waypointDays).getElement(), RenderPosition.BEFOREEND);
 
   const tripEventContainers = tripEventsElement.querySelectorAll(`.trip-events__list`);
 
-  render(tripEventContainers[0], createAddEditFormTemplate(events[0]), `beforeend`);
   let waypointsContainerCount = 0;
 
-  for (let i = 1; i < ROUTE_POINT_COUNT; i++) {
-    if (events[i].startEvent.getDate() === waypointDays[waypointsContainerCount].getDate()) {
-      render(tripEventContainers[waypointsContainerCount], createWaypointTemplate(events[i]), `beforeend`);
+  events.forEach((event) => {
+    if (event.startEvent.getDate() === waypointDays[waypointsContainerCount].getDate()) {
+      renderWaypoint(tripEventContainers[waypointsContainerCount], event);
     } else {
       waypointsContainerCount++;
-      render(tripEventContainers[waypointsContainerCount], createWaypointTemplate(events[i]), `beforeend`);
+      renderWaypoint(tripEventContainers[waypointsContainerCount], event);
     }
-  }
+  });
 };
 
 renderPageAplication();

@@ -1,4 +1,4 @@
-import {checkLessThanTen} from "../view/waypoint.js";
+import {createElement, checkLessThanTen} from "../utils.js";
 
 const getDate = (date) => {
   const month = date.getMonth() + 1;
@@ -27,9 +27,32 @@ const createWaypointDayTemplate = (waypointDays) => {
             </li>`).join(``);
 };
 
-export const createWaypointsContainerTemplate = (waypointDays) => {
+const createWaypointsContainerTemplate = (waypointDays) => {
 
   return `<ul class="trip-days">
             ${createWaypointDayTemplate(waypointDays)}
     </ul>`;
 };
+
+export default class WaypointsContainer {
+  constructor(waypointDays) {
+    this._waypointDays = waypointDays;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createWaypointsContainerTemplate(this._waypointDays);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

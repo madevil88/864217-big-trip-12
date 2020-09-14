@@ -1,4 +1,6 @@
-export const createRouteInfoTemplate = (events) => {
+import {createElement} from "../utils.js";
+
+const createRouteInfoTemplate = (events) => {
 
   const getRoute = () => {
     const destinations = [];
@@ -26,3 +28,26 @@ export const createRouteInfoTemplate = (events) => {
           </section>`
   );
 };
+
+export default class RouteInfo {
+  constructor(events) {
+    this._events = events;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createRouteInfoTemplate(this._events);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

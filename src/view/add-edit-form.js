@@ -1,44 +1,5 @@
-import {EVENT_TYPES, DESTINATIONS, OFFERS} from "../mock/event.js";
-import {getTypeDestination, checkLessThanTen} from "../view/waypoint.js";
-
-const defaultEvent = {
-  type: `Flight`,
-  destination: `Dublin`,
-  startEvent: new Date(),
-  endEvent: new Date(),
-  price: 0,
-  isFavorite: true,
-  offers: [
-    {
-      name: `luggage`,
-      get description() {
-        return `Add ${this.name}`;
-      },
-      price: 30
-    },
-    {
-      name: `comfort`,
-      get description() {
-        return `Switch to ${this.name} class`;
-      },
-      price: 100
-    }
-  ],
-  destinationDescriptions: [
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-    `Nunc fermentum tortor ac porta dapibus.`,
-    `Fusce tristique felis at fermentum pharetra.`,
-    `Aliquam erat volutpat.`,
-    `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`
-  ],
-  destinationPhotos: [
-    `img/photos/1.jpg`,
-    `img/photos/2.jpg`,
-    `img/photos/3.jpg`,
-    `img/photos/4.jpg`,
-    `img/photos/5.jpg`
-  ]
-};
+import {EVENT_TYPES, DESTINATIONS, OFFERS, DEFAULT_EVENT} from "../const.js";
+import {createElement, getTypeDestination, checkLessThanTen} from "../utils.js";
 
 const transferEvents = EVENT_TYPES.slice(0, 7);
 const activityEvents = EVENT_TYPES.slice(7, 10);
@@ -81,7 +42,7 @@ const getHumanizeDate = (date) => {
 };
 
 const createOffersTemplate = () => {
-  const checkedOffers = defaultEvent.offers.map((checkedOffer) => {
+  const checkedOffers = DEFAULT_EVENT.offers.map((checkedOffer) => {
     return Object.values(checkedOffer)[0];
   });
 
@@ -122,10 +83,10 @@ const createPhotosTape = (photos) => {
   `).join(``)}</div>`;
 };
 
-export const createAddEditFormTemplate = (event = defaultEvent) => {
+const createAddEditFormTemplate = (event) => {
 
-  return (
-    `<form class="trip-events__item  event  event--edit" action="#" method="post">
+  return `<div>
+          <form class="trip-events__item  event  event--edit" method="post">
             <header class="event__header">
               <div class="event__type-wrapper">
                 <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -207,6 +168,29 @@ export const createAddEditFormTemplate = (event = defaultEvent) => {
                 ${createPhotosTape(event.destinationPhotos)}
               </section>
             </section>
-          </form>`
-  );
+          </form>
+        </div>`;
 };
+
+export default class AddEditForm {
+  constructor(event = DEFAULT_EVENT) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createAddEditFormTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

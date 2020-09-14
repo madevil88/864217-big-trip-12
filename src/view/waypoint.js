@@ -1,3 +1,5 @@
+import {createElement, getTypeDestination, checkLessThanTen} from "../utils.js";
+
 const getDiffTime = (startEvent, endEvent) => {
   const viewDiffTime = [];
   const diffTime = (endEvent - startEvent) / 1000;
@@ -26,24 +28,7 @@ const createOffersTemplate = (offers) => {
       </li>`).join(``);
 };
 
-export const checkLessThanTen = (number) => {
-  return (number.toString().length === 2) ? number : `0${number}`;
-};
-
-export const getTypeDestination = (type) => {
-  switch (type) {
-    case `Check`:
-      return `${type} in`;
-    case `Sightseeing`:
-      return `${type} in`;
-    case `Restaurant`:
-      return `${type} in`;
-    default:
-      return `${type} to`;
-  }
-};
-
-export const createWaypointTemplate = (event) => {
+const createWaypointTemplate = (event) => {
   const {type, destination, startEvent, endEvent, price, offers} = event;
 
   return (
@@ -59,9 +44,9 @@ export const createWaypointTemplate = (event) => {
       <h3 class="event__title">${getTypeDestination(type)} ${destination}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${startEvent.toJSON()}">${checkLessThanTen(startEvent.getHours())}:${checkLessThanTen(startEvent.getMinutes())}</time>
+            <time class="event__start-time" datetime="${startEvent.toISOString()}">${checkLessThanTen(startEvent.getHours())}:${checkLessThanTen(startEvent.getMinutes())}</time>
             &mdash;
-            <time class="event__end-time" datetime="${endEvent.toJSON()}">${checkLessThanTen(endEvent.getHours())}:${checkLessThanTen(endEvent.getMinutes())}</time>
+            <time class="event__end-time" datetime="${endEvent.toISOString()}">${checkLessThanTen(endEvent.getHours())}:${checkLessThanTen(endEvent.getMinutes())}</time>
           </p>
           <p class="event__duration">${getDiffTime(startEvent, endEvent)}</p>
         </div>
@@ -82,3 +67,26 @@ export const createWaypointTemplate = (event) => {
     </li>`
   );
 };
+
+export default class Waypoint {
+  constructor(event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createWaypointTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
