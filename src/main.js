@@ -7,6 +7,7 @@ import SortView from "./view/sort.js";
 import WaypointsContainerView from "./view/waypoints-container.js";
 import AddEditFormView from "./view/add-edit-form.js";
 import WaypointView from "./view/waypoint.js";
+import NoEventView from "./view/no-event.js";
 import {generateEvent} from "./mock/event.js";
 import {ROUTE_POINT_COUNT} from "./const.js";
 import {render, RenderPosition} from "./utils.js";
@@ -27,8 +28,6 @@ const getWaypointDays = () => {
   });
   return waypointDays;
 };
-
-const waypointDays = getWaypointDays(events);
 
 const renderWaypoint = (tripEventContainer, event) => {
   const eventComponent = new WaypointView(event);
@@ -66,23 +65,23 @@ const renderWaypoint = (tripEventContainer, event) => {
   render(tripEventContainer, eventComponent.getElement(), RenderPosition.BEFOREEND);
 };
 
+const pageBody = document.querySelector(`.page-body`);
+const pageHeader = pageBody.querySelector(`.page-header`);
+const pageMain = pageBody.querySelector(`.page-main`);
+const tripMainElement = pageHeader.querySelector(`.trip-main`);
+const tripMainControlsElement = tripMainElement.querySelector(`.trip-main__trip-controls`);
+const tripEventsElement = pageMain.querySelector(`.trip-events`);
+
 const renderPageAplication = () => {
-  const pageBody = document.querySelector(`.page-body`);
-  const pageHeader = pageBody.querySelector(`.page-header`);
-  const pageMain = pageBody.querySelector(`.page-main`);
 
-  const tripMainElement = pageHeader.querySelector(`.trip-main`);
+  const waypointDays = getWaypointDays(events);
+  const tripMainInfoElement = new RouteInfoView(events);
+  render(tripMainElement, tripMainInfoElement.getElement(), RenderPosition.AFTERBEGIN);
+  render(tripMainInfoElement.getElement(), new TripCostView(events).getElement(), RenderPosition.BEFOREEND);
 
-  render(tripMainElement, new RouteInfoView(events).getElement(), RenderPosition.AFTERBEGIN);
-
-  const tripMainInfoElement = tripMainElement.querySelector(`.trip-main__trip-info`);
-  render(tripMainInfoElement, new TripCostView(events).getElement(), RenderPosition.BEFOREEND);
-
-  const tripMainControlsElement = tripMainElement.querySelector(`.trip-main__trip-controls`);
   render(tripMainControlsElement, new MenuView().getElement(), RenderPosition.BEFOREEND);
   render(tripMainControlsElement, new FilterView().getElement(), RenderPosition.BEFOREEND);
 
-  const tripEventsElement = pageMain.querySelector(`.trip-events`);
   render(tripEventsElement, new SortView().getElement(), RenderPosition.BEFOREEND);
   render(tripEventsElement, new WaypointsContainerView(waypointDays).getElement(), RenderPosition.BEFOREEND);
 
@@ -100,4 +99,8 @@ const renderPageAplication = () => {
   });
 };
 
-renderPageAplication();
+if (events.length === 0) {
+  render(tripEventsElement, new NoEventView().getElement(), RenderPosition.BEFOREEND);
+} else {
+  renderPageAplication();
+}
