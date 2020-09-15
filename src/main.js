@@ -100,4 +100,8 @@ const renderPageAplication = () => {
   });
 };
 
-renderPageAplication();
+if (events.length === 0) {
+  render(tripEventsElement, new NoEventView().getElement(), RenderPosition.BEFOREEND);
+} else {
+  renderPageAplication();
+}
