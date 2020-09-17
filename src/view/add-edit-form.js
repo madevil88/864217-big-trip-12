@@ -1,5 +1,8 @@
 import {EVENT_TYPES, DESTINATIONS, OFFERS, DEFAULT_EVENT} from "../const.js";
-import {createElement, getTypeDestination, checkLessThanTen} from "../utils.js";
+import {checkLessThanTen} from "../utils/common.js";
+import {getTypeDestination} from "../utils/event.js";
+// import {getTypeDestination, checkLessThanTen} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const transferEvents = EVENT_TYPES.slice(0, 7);
 const activityEvents = EVENT_TYPES.slice(7, 10);
@@ -172,25 +175,24 @@ const createAddEditFormTemplate = (event) => {
         </div>`;
 };
 
-export default class AddEditForm {
+export default class AddEditForm extends AbstractView {
   constructor(event = DEFAULT_EVENT) {
+    super();
     this._event = event;
-    this._element = null;
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
   }
 
   getTemplate() {
     return createAddEditFormTemplate(this._event);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

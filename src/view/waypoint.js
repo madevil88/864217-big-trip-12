@@ -1,4 +1,6 @@
-import {createElement, getTypeDestination, checkLessThanTen} from "../utils.js";
+import {checkLessThanTen} from "../utils/common.js";
+import {getTypeDestination} from "../utils/event.js";
+import AbstractView from "./abstract.js";
 
 const getDiffTime = (startEvent, endEvent) => {
   const viewDiffTime = [];
@@ -68,25 +70,24 @@ const createWaypointTemplate = (event) => {
   );
 };
 
-export default class Waypoint {
+export default class Waypoint extends AbstractView {
   constructor(event) {
+    super();
     this._event = event;
-    this._element = null;
+    this._arrowClickHandler = this._arrowClickHandler.bind(this);
+  }
+
+  _arrowClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.arrowClick();
+  }
+
+  setArrowClickHandler(callback) {
+    this._callback.arrowClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._arrowClickHandler);
   }
 
   getTemplate() {
     return createWaypointTemplate(this._event);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

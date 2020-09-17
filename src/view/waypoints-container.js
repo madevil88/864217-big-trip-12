@@ -1,4 +1,5 @@
-import {createElement, checkLessThanTen} from "../utils.js";
+import {checkLessThanTen} from "../utils/common.js";
+import AbstractView from "./abstract.js";
 
 const getDate = (date) => {
   const month = date.getMonth() + 1;
@@ -14,7 +15,7 @@ const getShotDate = (date) => {
   return date.toLocaleString(`en-US`, {day: `numeric`, month: `short`});
 };
 
-const createWaypointDayTemplate = (waypointDays) => {
+const createWaypointDaysTemplate = (waypointDays) => {
 
   return waypointDays.map((waypointDay, index) =>
     `<li class="trip-days__item  day">
@@ -30,29 +31,17 @@ const createWaypointDayTemplate = (waypointDays) => {
 const createWaypointsContainerTemplate = (waypointDays) => {
 
   return `<ul class="trip-days">
-            ${createWaypointDayTemplate(waypointDays)}
+            ${createWaypointDaysTemplate(waypointDays)}
     </ul>`;
 };
 
-export default class WaypointsContainer {
+export default class WaypointsContainer extends AbstractView {
   constructor(waypointDays) {
+    super();
     this._waypointDays = waypointDays;
-    this._element = null;
   }
 
   getTemplate() {
     return createWaypointsContainerTemplate(this._waypointDays);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

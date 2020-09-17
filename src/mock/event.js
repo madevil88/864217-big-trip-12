@@ -1,5 +1,5 @@
 import {EVENT_TYPES, DESTINATIONS, MAX_PRICE, OFFERS, DESTINATION_DESCRIPTIONS} from "../const.js";
-import {getRandomInteger} from "../utils.js";
+import {getRandomInteger} from "../utils/common.js";
 
 const getRandomElement = (arr) => {
   return arr[getRandomInteger(0, arr.length - 1)];
