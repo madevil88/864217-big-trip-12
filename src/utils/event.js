@@ -45,7 +45,7 @@ const sortTimeDown = (firstEvent, secondEvent) => {
     return weight;
   }
 
-  return secondEvent.startEvent.getTime() - firstEvent.startEvent.getTime();
+  return (secondEvent.endEvent.getTime() - secondEvent.startEvent.getTime()) - (firstEvent.endEvent.getTime() - firstEvent.startEvent.getTime());
 };
 
 const sortPriceDown = (firstEvent, secondEvent) => {
