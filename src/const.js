@@ -97,6 +97,18 @@ const ESCAPE_KEY = {
   fullName: `Escape`
 };
 
+const SORT_TYPE = {
+  EVENT: `event`,
+  TIME: `time`,
+  PRICE: `price`
+};
+
+const TYPE_PREFIX_IN = {
+  CHECK: `Check`,
+  SIGHTSEEING: `Sightseeing`,
+  RESTAURANT: `Restaurant`
+};
+
 export {
   ROUTE_POINT_COUNT,
   EVENT_TYPES,
@@ -105,5 +117,7 @@ export {
   OFFERS,
   DESTINATION_DESCRIPTIONS,
   DEFAULT_EVENT,
-  ESCAPE_KEY
+  ESCAPE_KEY,
+  SORT_TYPE,
+  TYPE_PREFIX_IN
 };

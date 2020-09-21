@@ -34,7 +34,7 @@ const createWaypointTemplate = (event) => {
   const {type, destination, startEvent, endEvent, price, offers} = event;
 
   return (
-    `<li class="trip-events__item">
+    `<li class="trip-events__item" style="list-style: none;">
       <div class="event">
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${
